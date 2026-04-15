@@ -29,7 +29,8 @@ export const indexBoostHapiPlugin: Plugin<IndexBoostOptions> = {
     const timeout = options.timeout ?? 30_000;
 
     server.ext("onPreResponse", async (request: Request, h: ResponseToolkit): Promise<Lifecycle.ReturnValue> => {
-      const ua = request.headers["user-agent"] ?? "";
+      const rawUa = request.headers["user-agent"] ?? "";
+      const ua = Array.isArray(rawUa) ? rawUa[0] ?? "" : rawUa;
 
       if (request.method !== "get") return h.continue;
       if (isStaticAsset(request.path, options.ignoredExtensions)) return h.continue;
