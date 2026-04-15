@@ -1,0 +1,46 @@
+name: Publish Python package (PyPI)
+
+on:
+  push:
+    tags:
+      - "django/v*"   # e.g. django/v1.2.3
+
+jobs:
+  publish:
+    name: Publish indexboost-django ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write   # for PyPI trusted publishing (OIDC)
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Resolve version from tag
+        id: ver
+        run: |
+          TAG="${GITHUB_REF_NAME}"       # e.g. "django/v1.2.3"
+          echo "version=${TAG#*/v}" >> "$GITHUB_OUTPUT"
+
+      - name: Set version in pyproject.toml
+        working-directory: django
+        run: |
+          sed -i "s/^version = .*/version = \"${{ steps.ver.outputs.version }}\"/" pyproject.toml
+
+      - name: Install build tools
+        run: pip install --upgrade build hatchling
+
+      - name: Build distribution
+        working-directory: django
+        run: python -m build
+
+      # Option A — PyPI Trusted Publishing (OIDC, no token needed)
+      # Configure at https://pypi.org/manage/project/indexboost-django/settings/publishing/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: django/dist/

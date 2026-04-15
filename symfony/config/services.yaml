@@ -1,0 +1,11 @@
+# config/services.yaml snippet — add to your project's services.yaml
+
+services:
+    App\EventSubscriber\IndexBoostSubscriber:
+        autowire: true
+        autoconfigure: true
+        # The subscriber is tagged automatically by Symfony's autoconfigure.
+        # No manual tag needed.
+
+# Environment variable (set in .env or system environment):
+# INDEXBOOST_TOKEN=your_token_here

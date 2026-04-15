@@ -1,0 +1,43 @@
+# IndexBoost Render — Apache .htaccess (SPA / WordPress / PHP)
+#
+# Drop this file into your document root (where index.php or index.html lives).
+#
+# Requirements:
+#   - mod_rewrite  (enabled on most shared hosts)
+#   - mod_headers  (for setting proxy request headers — may need server config)
+#   - mod_proxy + mod_proxy_http (may require ServerAdmin to enable)
+#
+# Replace:
+#   YOUR_INDEXBOOST_TOKEN  → your token from app.getindexboost.com/sites → Render Tokens
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # ── Static assets — never render ──────────────────────────────────────
+    RewriteRule \.(js|css|png|jpg|jpeg|gif|webp|svg|ico|woff|woff2|ttf|eot|otf|pdf|zip|xml|map|txt|json|csv|gz|br)$ - [L]
+
+    # ── Crawler detection ─────────────────────────────────────────────────────
+    # If the User-Agent matches a known crawler, set the RENDER env var
+    RewriteCond %{HTTP_USER_AGENT} (googlebot|bingbot|gptbot|claudebot|perplexitybot|duckduckbot|slurp|naverbot|yandexbot|baiduspider|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|applebot|rogerbot|semrushbot|ahrefsbot|bytespider|dotbot|mj12bot|pinterestbot) [NC]
+    RewriteRule ^ - [E=RENDER:true]
+
+    # ── Proxy crawlers to render service ─────────────────────────────────────
+    RewriteCond %{ENV:RENDER} true
+    RewriteRule ^(.*)$ https://render.getindexboost.com/?url=%{REQUEST_SCHEME}://%{HTTP_HOST}%{REQUEST_URI} [P,L]
+
+    # Set the token header on the proxied request
+    <IfModule mod_headers.c>
+        RequestHeader set X-INDEXBOOST-TOKEN "YOUR_INDEXBOOST_TOKEN" env=RENDER
+    </IfModule>
+
+    # ── SPA fallback — regular users ──────────────────────────────────────────
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ /index.html [L]
+</IfModule>
+
+# ── Proxy SSL passthrough ─────────────────────────────────────────────────────
+<IfModule mod_proxy.c>
+    SSLProxyEngine On
+    ProxyPassReverse / https://render.getindexboost.com/
+</IfModule>

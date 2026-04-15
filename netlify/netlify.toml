@@ -1,0 +1,6 @@
+[[edge_functions]]
+path = "/*"
+function = "render"
+
+[build]
+publish = "dist"

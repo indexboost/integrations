@@ -1,0 +1,43 @@
+# IndexBoost Render — Wrangler configuration
+# https://developers.cloudflare.com/workers/wrangler/configuration/
+
+name = "indexboost-render"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# ── Environment variables ────────────────────────────────────────────────────
+# Do NOT set INDEXBOOST_TOKEN here — use a secret instead:
+#
+#   wrangler secret put INDEXBOOST_TOKEN
+#
+# Or set it in the Cloudflare Dashboard:
+#   Workers & Pages → indexboost-render → Settings → Variables & Secrets
+
+# ── Routes ───────────────────────────────────────────────────────────────────
+# Replace "example.com" with your domain (must be proxied through Cloudflare).
+
+[[routes]]
+pattern = "example.com/*"
+zone_name = "example.com"
+
+# Uncomment to also cover the www subdomain:
+# [[routes]]
+# pattern = "www.example.com/*"
+# zone_name = "example.com"
+
+# ── Environments ─────────────────────────────────────────────────────────────
+
+[env.production]
+name = "indexboost-render-prod"
+
+[[env.production.routes]]
+pattern = "example.com/*"
+zone_name = "example.com"
+
+[env.staging]
+name = "indexboost-render-staging"
+
+[[env.staging.routes]]
+pattern = "staging.example.com/*"
+zone_name = "example.com"

@@ -1,0 +1,35 @@
+name: Publish PHP package (Packagist)
+
+on:
+  push:
+    tags:
+      - "laravel/v*"   # e.g. laravel/v1.2.3
+
+jobs:
+  publish:
+    name: Notify Packagist — indexboost/laravel ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve version from tag
+        id: ver
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          echo "version=${TAG#*/v}" >> "$GITHUB_OUTPUT"
+
+      - name: Set version in composer.json
+        working-directory: laravel
+        run: |
+          # Requires jq
+          jq ".version = \"${{ steps.ver.outputs.version }}\"" composer.json > composer.tmp.json
+          mv composer.tmp.json composer.json
+
+      # Packagist auto-updates when you push a tag to the linked GitHub repo.
+      # The webhook below manually triggers Packagist in case auto-update is not configured.
+      - name: Trigger Packagist webhook
+        run: |
+          curl -sX POST \
+            "https://packagist.org/api/update-package?username=${{ secrets.PACKAGIST_USERNAME }}&apiToken=${{ secrets.PACKAGIST_TOKEN }}" \
+            -d '{"repository":{"url":"https://github.com/indexboost/integrations"}}'

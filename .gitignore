@@ -1,0 +1,38 @@
+# Node
+node_modules/
+dist/
+*.tgz
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+dist/
+build/
+
+# Ruby
+*.gem
+.bundle/
+vendor/bundle/
+
+# .NET
+bin/
+obj/
+*.nupkg
+*.snupkg
+
+# PHP / Composer
+vendor/
+
+# Java
+target/
+*.class
+*.jar
+
+# Editors
+.DS_Store
+.idea/
+.vscode/
+*.swp

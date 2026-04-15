@@ -1,0 +1,32 @@
+{
+  "rewrites": [
+    {
+      "source": "/((?!api/|_next/|.*\\.[a-zA-Z0-9]+$).*)",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(googlebot|bingbot|gptbot|claudebot|perplexitybot|duckduckbot|slurp|naverbot|yandexbot|baiduspider|facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|applebot|rogerbot|semrushbot|ahrefsbot|bytespider|dotbot|mj12bot|pinterestbot).*"
+        }
+      ],
+      "destination": "/api/render"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/render",
+      "has": [
+        {
+          "type": "header",
+          "key": "x-forwarded-host"
+        }
+      ],
+      "headers": [
+        {
+          "key": "x-original-url",
+          "value": "https://:x-forwarded-host/:path*"
+        }
+      ]
+    }
+  ]
+}
