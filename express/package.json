@@ -27,14 +27,22 @@
     "test": "node --experimental-vm-modules node_modules/.bin/jest"
   },
   "peerDependencies": {
-    "express": ">=4.0.0"
+    "express": ">=4.0.0",
+    "koa": ">=2.0.0",
+    "@hapi/hapi": ">=21.0.0"
   },
   "peerDependenciesMeta": {
-    "express": { "optional": true }
+    "express": { "optional": true },
+    "koa": { "optional": true },
+    "@hapi/hapi": { "optional": true }
   },
   "devDependencies": {
+    "@hapi/hapi": "^21.0.0",
     "@types/express": "^5.0.0",
+    "@types/hapi__hapi": "^21.0.0",
+    "@types/koa": "^2.15.0",
     "@types/node": "^22.0.0",
+    "koa": "^2.15.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   }
