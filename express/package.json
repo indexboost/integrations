@@ -12,9 +12,9 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     }
   },
   "main": "./dist/index.cjs",
@@ -39,7 +39,6 @@
   "devDependencies": {
     "@hapi/hapi": "^21.0.0",
     "@types/express": "^5.0.0",
-    "@types/hapi__hapi": "^21.0.0",
     "@types/koa": "^2.15.0",
     "@types/node": "^22.0.0",
     "koa": "^2.15.0",
