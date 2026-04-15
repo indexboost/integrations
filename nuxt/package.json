@@ -4,6 +4,10 @@
   "description": "IndexBoost Render module for Nuxt 3",
   "keywords": ["indexboost", "render", "seo", "crawler", "nuxt", "nuxt3", "nuxtjs"],
   "homepage": "https://getindexboost.com/docs/integrations/nuxt",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/indexboost/integrations"
+  },
   "license": "MIT",
   "type": "module",
   "exports": {
