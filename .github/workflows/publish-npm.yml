@@ -30,7 +30,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           registry-url: "https://registry.npmjs.org"
 
       # ── Determine which package to publish ─────────────────────────────────
@@ -60,7 +60,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ${{ steps.pkg.outputs.dir }}
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       # Patch the version in package.json to match the tag
       - name: Set version
