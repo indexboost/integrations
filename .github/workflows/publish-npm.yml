@@ -1,6 +1,7 @@
 name: Publish npm packages
 
 on:
+  workflow_dispatch:    # manual trigger for testing
   push:
     tags:
       - "node/v*"       # e.g. node/v1.2.3  → publishes @indexboost/node
