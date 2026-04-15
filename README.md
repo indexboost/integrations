@@ -1,103 +1,138 @@
-# Renderfy — Integrations
+# IndexBoost — Integrations
 
-Renderfy é um componente 100% server-side. Ele funciona independentemente do framework frontend (React, Angular, Vue, Svelte, etc.). O que importa é **como** os arquivos estáticos são servidos — e é nesse ponto que as integrações atuam.
+IndexBoost is a 100% server-side render cache. It works independently of your frontend framework (React, Angular, Vue, Svelte, etc.). What matters is **how** traffic is routed — and that is exactly what these integrations do.
 
-## Como funciona
+## How it works
 
-Cada integração intercepta requisições de crawlers (Googlebot, GPTBot, Bingbot, etc.) e redireciona essas requisições para o serviço Renderfy, que retorna HTML pré-renderizado. O fluxo é:
+Each integration intercepts requests from web crawlers (Googlebot, GPTBot, ClaudeBot, Bingbot, etc.) and forwards them to the IndexBoost render service, which returns fully rendered HTML. Regular user traffic passes through to your app unchanged.
 
 ```
-Crawler → [Integração] → Renderfy API → HTML renderizado → Crawler
-Usuário normal → [Integração] → SPA/App original (sem alteração)
+Crawler  → [Integration] → render.getindexboost.com → Rendered HTML → Crawler
+User     → [Integration] → Your app (no change)
 ```
 
-## Categorias de integração
+All integrations authenticate with a single header: `X-INDEXBOOST-TOKEN`.
+Get your token at **[app.getindexboost.com](https://app.getindexboost.com) → Sites → your site → Render Tokens**.
 
-### 🟢 Web Servers (config-only — sem código Renderfy)
-Integrações baseadas em configuração do servidor. O usuário adiciona regras de rewrite/proxy no config do servidor.
+---
 
-| Integração | Tipo | Código necessário |
+## Integration categories
+
+### 🟢 Web servers (config-only)
+
+| Integration | Files |
+|---|---|
+| [Nginx](./nginx/) | `nginx-spa.conf`, `nginx-php.conf`, `nginx-proxy.conf` |
+| [Apache](./apache/) | `.htaccess`, `httpd-vhost.conf` |
+| [HAProxy](./haproxy/) | `haproxy.cfg` |
+| [IIS](./iis/) | `web.config`, `IndexBoostModule.cs` |
+
+### 🔵 CDN / Edge
+
+| Integration | Package / Files |
+|---|---|
+| [Cloudflare Workers](./cloudflare/) | `worker.js` + `wrangler.toml` |
+| [CloudFront Lambda@Edge](./cloudfront/) | `lambda/index.js` |
+| [Netlify Edge Functions](./netlify/) | `netlify/edge-functions/render.ts` |
+| [Fastly VCL](./fastly/) | `fastly.vcl` |
+| [Akamai EdgeWorkers](./akamai/) | `src/main.js` |
+| [Vercel](./vercel/) | `api/render.js` + `vercel.json` |
+
+### 🟣 Node.js
+
+| Integration | npm package | Adapters |
 |---|---|---|
-| [Nginx](./nginx.md) | Config | Não — apenas nginx.conf |
-| [Apache](./apache.md) | Config | Não — apenas .htaccess |
-| [IIS](./iis.md) | Config | Não — URL Rewrite rules |
+| [Express](./express/) | [`@indexboost/node`](https://www.npmjs.com/package/@indexboost/node) | Express, Koa, Hapi |
+| [Next.js](./nextjs/) | [`@indexboost/next`](https://www.npmjs.com/package/@indexboost/next) | App Router, Pages Router |
+| [Nuxt 3](./nuxt/) | [`@indexboost/nuxt`](https://www.npmjs.com/package/@indexboost/nuxt) | Nitro server middleware |
 
-### 🔵 CDN / Edge (config + worker script)
-Integrações em CDNs que interceptam no edge antes de chegar ao origin server.
+### 🟡 Backend frameworks
 
-| Integração | Tipo | Código necessário |
+| Integration | Package |
+|---|---|
+| [Laravel (PHP)](./laravel/) | [`indexboost/laravel`](https://packagist.org/packages/indexboost/laravel) |
+| [Symfony (PHP)](./symfony/) | Event subscriber (copy to `src/`) |
+| [Django (Python)](./django/) | [`indexboost-django`](https://pypi.org/project/indexboost-django/) |
+| [Rails (Ruby)](./rails/) | [`indexboost-rails`](https://rubygems.org/gems/indexboost-rails) |
+| [Spring Boot (Java)](./spring/) | Copy `IndexBoostInterceptor.java` |
+| [ASP.NET Core (C#)](./aspnet/) | [`IndexBoost.AspNetCore`](https://www.nuget.org/packages/IndexBoost.AspNetCore) |
+
+### ⚪ Hosting platforms
+
+| Integration | Notes |
+|---|---|
+| [Firebase Hosting](./firebase/) | Cloud Function as render proxy |
+| [Docker](./docker/) | Nginx sidecar via docker-compose |
+
+### 🔴 No-code
+
+| Integration | Notes |
+|---|---|
+| [Bubble.io](./bubble/) | Route via Cloudflare Worker in front of Bubble |
+
+---
+
+## API contract
+
+All integrations call the same endpoint:
+
+```
+GET https://render.getindexboost.com/?url={encoded_url}
+X-INDEXBOOST-TOKEN: <your_token>
+```
+
+The service returns fully rendered HTML with status 200 on success, or a non-2xx status on error — in which case all integrations fall back to the origin transparently.
+
+---
+
+## Repository structure
+
+```
+akamai/          Akamai EdgeWorkers JS
+apache/          Apache .htaccess + VirtualHost
+aspnet/          ASP.NET Core NuGet package
+bubble/          Bubble.io no-code guide
+cloudflare/      Cloudflare Worker + wrangler.toml
+cloudfront/      AWS Lambda@Edge
+django/          indexboost-django pip package
+docker/          Docker Compose + Nginx sidecar
+express/         @indexboost/node (Express / Koa / Hapi)
+fastly/          Fastly VCL
+firebase/        Firebase Hosting + Cloud Function
+haproxy/         HAProxy config
+iis/             IIS web.config + HTTP Module
+laravel/         indexboost/laravel Composer package
+nextjs/          @indexboost/next
+nginx/           Nginx configs (SPA / PHP / Proxy)
+nuxt/            @indexboost/nuxt
+rails/           indexboost-rails gem
+spring/          Spring Boot interceptor
+symfony/         Symfony EventSubscriber
+vercel/          Vercel Edge Function
+```
+
+---
+
+## Publishing
+
+Packages are published automatically via GitHub Actions when a version tag is pushed:
+
+| Tag pattern | Registry | Package |
 |---|---|---|
-| [Cloudflare](./cloudflare.md) | Worker (JS) | Worker script fornecido por nós |
-| [CloudFront](./cloudfront.md) | Lambda@Edge | Lambda function fornecida por nós |
-| [Fastly](./fastly.md) | VCL/Compute | VCL config fornecida por nós |
-| [Akamai](./akamai.md) | EdgeWorkers | Config fornecida por nós |
-| [Netlify](./netlify.md) | Edge Functions | _redirects / netlify.toml |
+| `node/v*` | npm | `@indexboost/node` |
+| `next/v*` | npm | `@indexboost/next` |
+| `nuxt/v*` | npm | `@indexboost/nuxt` |
+| `django/v*` | PyPI | `indexboost-django` |
+| `rails/v*` | RubyGems | `indexboost-rails` |
+| `aspnet/v*` | NuGet | `IndexBoost.AspNetCore` |
+| `laravel/v*` | Packagist | `indexboost/laravel` |
 
-### 🟣 Node.js Middleware (pacote npm)
-Middleware que se instala no servidor Node.js do usuário.
+Example: `git tag node/v1.2.0 && git push origin node/v1.2.0`
 
-| Integração | Tipo | Código necessário |
-|---|---|---|
-| [Express.js](./express.md) | npm middleware | Sim — pacote `renderfy-node` |
-| [Nuxt.js](./nuxt.md) | Nuxt module | Sim — pacote `renderfy-nuxt` |
-| [Next.js](./nextjs.md) | Next middleware | Sim — pacote `renderfy-next` |
-| [Koa](./koa.md) | Koa middleware | Sim — pacote `renderfy-node` |
-| [Hapi](./hapi.md) | Hapi plugin | Sim — pacote `renderfy-node` |
+---
 
-### 🟡 Backend Frameworks (pacote/gem/pip)
-Middleware nativo para frameworks backend populares.
+## License
 
-| Integração | Tipo | Código necessário |
-|---|---|---|
-| [Rails (Ruby)](./rails.md) | Rack middleware | Sim — gem `renderfy_rails` |
-| [Laravel (PHP)](./laravel.md) | HTTP middleware | Sim — pacote `renderfy/laravel` |
-| [Symfony (PHP)](./symfony.md) | Event subscriber | Sim — pacote `renderfy/symfony` |
-| [Django (Python)](./django.md) | WSGI middleware | Sim — pacote `renderfy-django` |
-| [Spring (Java)](./spring.md) | Filter/Interceptor | Sim — pacote Maven |
-| [ASP.NET (C#)](./aspnet.md) | DelegatingHandler | Sim — NuGet package |
+MIT — © IndexBoost
 
-### ⚪ Hosting Platforms (config-only)
-Plataformas de hosting que usam configs específicas.
 
-| Integração | Tipo | Código necessário |
-|---|---|---|
-| [Firebase](./firebase.md) | Cloud Functions | Cloud Function + Cloudflare |
-| [Vercel](./vercel.md) | Edge Middleware | Sim — middleware.ts |
-| [Docker](./docker.md) | Reverse proxy | Não — docker-compose config |
-
-### 🔴 Plataformas No-Code
-| Integração | Tipo | Código necessário |
-|---|---|---|
-| [Bubble.io](./bubble.md) | Cloudflare Worker | Via Cloudflare (sem código no Bubble) |
-
-## Prioridades de implementação
-
-### Fase 1 — Core (MVP)
-1. **Nginx** — maior base de usuários
-2. **Cloudflare** — CDN mais popular
-3. **Express.js** — Node.js é o stack mais comum pra SPAs
-4. **Apache** — segundo servidor web mais usado
-5. **Docker** — self-hosted
-
-### Fase 2 — Frameworks
-6. **Laravel** — PHP líder de mercado
-7. **Django** — Python líder de mercado
-8. **Rails** — Ruby community
-9. **Symfony** — PHP enterprise
-10. **Next.js** — SSR/SSG combo
-
-### Fase 3 — CDN / Edge
-11. **CloudFront** — AWS ecosystem
-12. **Fastly** — high-performance CDN
-13. **Netlify** — JAMstack
-14. **Vercel** — Next.js hosting
-15. **Akamai** — enterprise CDN
-
-### Fase 4 — Complementar
-16. **Nuxt.js** — Vue ecosystem
-17. **IIS** — Windows servers
-18. **Spring (Java)** — enterprise Java
-19. **ASP.NET** — .NET ecosystem
-20. **Koa / Hapi** — Node.js alternativo
-21. **Firebase** — Google hosting
-22. **Bubble.io** — no-code

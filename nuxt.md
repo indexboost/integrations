@@ -1,48 +1,26 @@
-# Nuxt.js Integration
+# Nuxt 3 — `@indexboost/nuxt`
 
-**Categoria:** Node.js Framework (Nuxt module)
-**Prioridade:** Fase 4 — Complementar
-**Código Renderfy necessário:** ✅ Sim — pacote `renderfy-nuxt` (npm)
+**npm package:** [`@indexboost/nuxt`](https://www.npmjs.com/package/@indexboost/nuxt)
 
-## Descrição
+See the full guide in [`nuxt/README.md`](./nuxt/README.md).
 
-Nuxt.js é o framework Vue.js com SSR/SSG. A integração é um Nuxt server middleware que detecta crawlers.
-
-## Setup do usuário
+## Quick start
 
 ```bash
-npm install renderfy-nuxt
+npm install @indexboost/nuxt
 ```
 
 ```typescript
 // nuxt.config.ts
 export default defineNuxtConfig({
-  modules: ["renderfy-nuxt"],
-  renderfy: {
-    token: process.env.INDEXBOOST_TOKEN,
+  modules: ["@indexboost/nuxt"],
+  runtimeConfig: {
+    indexboostToken: process.env.INDEXBOOST_TOKEN,
   },
 });
 ```
 
-## Arquivos a criar
-
+```bash
+# .env
+INDEXBOOST_TOKEN=your_token_here
 ```
-packages/renderfy-nuxt/                       — Pacote npm
-  package.json
-  src/
-    module.ts                                — Nuxt module
-    runtime/
-      server-middleware.ts                   — Server middleware
-  README.md
-docs/docs/integrations/nuxt.md               — Documentação Docusaurus
-```
-
-## Tarefas
-
-- [ ] Criar pacote `renderfy-nuxt`
-- [ ] Implementar Nuxt module
-- [ ] Implementar server middleware
-- [ ] `README.md`
-- [ ] Publicar no npm
-- [ ] Documentação Docusaurus
-- [ ] Testar com Nuxt 3+ real

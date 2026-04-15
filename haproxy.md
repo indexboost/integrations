@@ -1,49 +1,15 @@
-# HAProxy Integration
+# HAProxy
 
-**Categoria:** Web Server / Load Balancer (config-only)
-**Prioridade:** Fase 4 — Complementar
-**Código Renderfy necessário:** ❌ Não — apenas configuração HAProxy
+No package required — copy the HAProxy configuration file.
 
-## Descrição
+See the full guide in [`haproxy/README.md`](./haproxy/README.md).
 
-HAProxy é um load balancer e reverse proxy de alta performance. A integração usa ACLs para detectar crawlers e redirecionar para um backend Renderfy.
+## Quick start
 
-## Como funciona
+1. Copy [`haproxy/haproxy.cfg`](./haproxy/haproxy.cfg) rules into your HAProxy config.
+2. Replace `YOUR_INDEXBOOST_TOKEN` with your actual token.
+3. Reload HAProxy: `haproxy -f /etc/haproxy/haproxy.cfg -sf $(cat /run/haproxy.pid)`
 
-1. ACL detecta user-agent de crawler
-2. `use_backend` condicional envia para backend Renderfy
-3. Backend Renderfy faz proxy para `service.renderfy.io`
+## How it works
 
-## Exemplo de config
-
-```haproxy
-frontend http
-    bind *:80
-
-    acl is_crawler hdr_sub(User-Agent) -i googlebot bingbot gptbot claudebot
-    acl is_static path_end .js .css .png .jpg .gif .svg .ico .woff .ttf
-
-    use_backend renderfy if is_crawler !is_static
-
-    default_backend app
-
-backend app
-    server app1 127.0.0.1:3000
-
-backend renderfy
-    http-request set-header X-INDEXBOOST-TOKEN YOUR_TOKEN
-    server renderfy service.renderfy.io:443 ssl verify required
-```
-
-## Arquivos a criar
-
-```
-docs/docs/integrations/haproxy.md            — Documentação Docusaurus
-integrations/haproxy/haproxy.cfg             — Config exemplo
-```
-
-## Tarefas
-
-- [ ] Criar config HAProxy exemplo
-- [ ] Documentação Docusaurus
-- [ ] Testar com HAProxy real
+Uses HAProxy ACLs to detect crawler `User-Agent` strings and proxy matching requests to `https://render.getindexboost.com/` with the `X-INDEXBOOST-TOKEN` header.

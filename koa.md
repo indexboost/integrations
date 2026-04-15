@@ -1,37 +1,19 @@
-# Koa (Node.js) Integration
+# Koa — `@indexboost/node`
 
-**Categoria:** Node.js Middleware
-**Prioridade:** Fase 4 — Complementar
-**Código Renderfy necessário:** ✅ Sim — usa pacote `renderfy-node` (mesmo do Express)
+Koa is supported via the same `@indexboost/node` package as Express.
 
-## Descrição
-
-Koa é um framework Node.js minimalista. Usa o mesmo pacote `renderfy-node` com um adaptador Koa.
-
-## Setup do usuário
+**npm package:** [`@indexboost/node`](https://www.npmjs.com/package/@indexboost/node)
 
 ```bash
-npm install renderfy-node
+npm install @indexboost/node
 ```
 
-```javascript
-const Koa = require("koa");
-const { koaMiddleware } = require("renderfy-node");
+```typescript
+import Koa from "koa";
+import { createKoaMiddleware } from "@indexboost/node";
 
 const app = new Koa();
-app.use(koaMiddleware({ token: "YOUR_TOKEN" }));
+app.use(createKoaMiddleware({ token: process.env.INDEXBOOST_TOKEN! }));
 ```
 
-## Arquivos a criar
-
-```
-docs/docs/integrations/koa.md               — Documentação Docusaurus
-```
-
-> O código é parte do pacote `renderfy-node` (ver [express.md](./express.md))
-
-## Tarefas
-
-- [ ] Implementar `koaMiddleware` no pacote `renderfy-node`
-- [ ] Documentação Docusaurus
-- [ ] Testar com Koa real
+See [`express/README.md`](./express/README.md) for full options.

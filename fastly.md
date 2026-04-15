@@ -1,30 +1,15 @@
-# Fastly Integration
+# Fastly
 
-**Categoria:** CDN / Edge (VCL)
-**Prioridade:** Fase 3 — CDN / Edge
-**Código Renderfy necessário:** ✅ Sim — VCL snippet fornecido por nós
+No npm package required — copy the Fastly VCL configuration.
 
-## Descrição
+See the full guide in [`fastly/README.md`](./fastly/README.md).
 
-Fastly é um CDN de alta performance. A integração usa VCL (Varnish Configuration Language) para detectar crawlers e redirecionar para o Renderfy como backend.
+## Quick start
 
-## Como funciona
+1. Copy the VCL snippets from [`fastly/`](./fastly/) into your Fastly service configuration.
+2. Replace `YOUR_INDEXBOOST_TOKEN` with your actual token.
+3. Deploy your Fastly service.
 
-1. VCL snippet no `vcl_recv` detecta crawlers
-2. Se crawler, seta backend para `service.renderfy.io`
-3. Adiciona header `X-INDEXBOOST-TOKEN`
-4. Modifica URL para incluir URL original
+## How it works
 
-## Arquivos a criar
-
-```
-docs/docs/integrations/fastly.md             — Documentação Docusaurus
-integrations/fastly/snippet.vcl              — VCL snippet
-```
-
-## Tarefas
-
-- [ ] Criar VCL snippet para crawler detection + proxy
-- [ ] Documentar configuração de backend no Fastly
-- [ ] Documentação Docusaurus
-- [ ] Testar com Fastly real
+Custom VCL detects crawler `User-Agent` strings at the edge and rewrites those requests to proxy through `https://render.getindexboost.com/` with your `X-INDEXBOOST-TOKEN` header.

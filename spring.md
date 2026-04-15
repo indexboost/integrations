@@ -1,53 +1,20 @@
-# Spring (Java) Integration
+# Spring Boot
 
-**Categoria:** Backend Framework (Maven/Gradle)
-**Prioridade:** Fase 4 — Complementar
-**Código Renderfy necessário:** ✅ Sim — pacote Maven `io.renderfy:renderfy-spring`
+No Maven/Gradle package required — copy the interceptor class.
 
-## Descrição
+See the full guide in [`spring/README.md`](./spring/README.md).
 
-Spring Boot é o framework Java mais popular. A integração é um `Filter` ou `HandlerInterceptor` que detecta crawlers.
+## Quick start
 
-## Setup do usuário
+1. Copy [`spring/src/main/java/.../IndexBoostInterceptor.java`](./spring/src/main/java/) into your project.
+2. Register the interceptor in your `WebMvcConfigurer`.
+3. Set `INDEXBOOST_TOKEN` in `application.properties` or as an environment variable.
 
-```xml
-<!-- pom.xml -->
-<dependency>
-    <groupId>io.renderfy</groupId>
-    <artifactId>renderfy-spring</artifactId>
-    <version>1.0.0</version>
-</dependency>
+```properties
+# application.properties
+indexboost.token=${INDEXBOOST_TOKEN}
 ```
 
-```yaml
-# application.yml
-renderfy:
-  token: ${INDEXBOOST_TOKEN}
-  service-url: https://service.renderfy.io
-  enabled: true
-```
+## How it works
 
-## Arquivos a criar
-
-```
-packages/renderfy-spring/                     — Maven package
-  pom.xml
-  src/main/java/io/renderfy/spring/
-    RenderfyAutoConfiguration.java
-    RenderfyFilter.java
-    CrawlerDetector.java
-    RenderfyProperties.java
-  README.md
-docs/docs/integrations/spring.md             — Documentação Docusaurus
-```
-
-## Tarefas
-
-- [ ] Criar pacote Maven `renderfy-spring`
-- [ ] Implementar `RenderfyFilter` (javax.servlet.Filter)
-- [ ] Implementar `CrawlerDetector`
-- [ ] Spring Boot auto-configuration
-- [ ] Properties via `application.yml`
-- [ ] Testes com JUnit
-- [ ] Publicar no Maven Central
-- [ ] Documentação Docusaurus
+A Spring `HandlerInterceptor` checks each request's `User-Agent`. Crawler requests are proxied to `https://render.getindexboost.com/` and the rendered HTML is returned. Human requests proceed normally.

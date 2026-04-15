@@ -1,24 +1,15 @@
-# Akamai Integration
+# Akamai EdgeWorkers
 
-**Categoria:** CDN / Edge (EdgeWorkers)
-**Prioridade:** Fase 3 — CDN / Edge
-**Código Renderfy necessário:** ✅ Sim — EdgeWorker script fornecido por nós
+No npm package required — deploy the EdgeWorkers script.
 
-## Descrição
+See the full guide in [`akamai/README.md`](./akamai/README.md).
 
-Akamai é o CDN enterprise líder. A integração usa EdgeWorkers para detectar crawlers no edge e redirecionar para o Renderfy.
+## Quick start
 
-## Arquivos a criar
+1. Package [`akamai/src/main.js`](./akamai/src/main.js) and deploy it as an Akamai EdgeWorker.
+2. Set `INDEXBOOST_TOKEN` as an EdgeWorker variable or embed it in the config.
+3. Activate on your Akamai property.
 
-```
-docs/docs/integrations/akamai.md             — Documentação Docusaurus
-integrations/akamai/main.js                  — EdgeWorker script
-integrations/akamai/bundle.json              — EdgeWorker bundle config
-```
+## How it works
 
-## Tarefas
-
-- [ ] Criar EdgeWorker script
-- [ ] Criar bundle.json
-- [ ] Documentação Docusaurus
-- [ ] Testar com Akamai (se acesso disponível)
+The EdgeWorker runs on the Akamai network, detects crawler `User-Agent` strings, and proxies those requests to `https://render.getindexboost.com/`. Human traffic passes through unchanged.

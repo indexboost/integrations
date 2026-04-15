@@ -1,49 +1,15 @@
-# Docker Integration
+# Docker
 
-**Categoria:** Hosting / Self-hosted (config-only)
-**Prioridade:** Fase 1 — Core
-**Código Renderfy necessário:** ❌ Não — apenas docker-compose config
+No special package required — use the provided Docker Compose configuration.
 
-## Descrição
+See the full guide in [`docker/README.md`](./docker/README.md).
 
-Para usuários que usam Docker, fornecemos configurações prontas para colocar um reverse proxy (Nginx) na frente do app containerizado que redireciona crawlers para o Renderfy.
+## Quick start
 
-## Como funciona
+1. Copy [`docker/docker-compose.yml`](./docker/docker-compose.yml) (or the relevant service block) into your project.
+2. Set `INDEXBOOST_TOKEN` in your `.env` file or Docker environment.
+3. Run: `docker compose up -d`
 
-1. Docker Compose com serviço Nginx como reverse proxy
-2. Nginx detecta crawlers e faz proxy_pass para Renderfy
-3. Requests normais vão para o container do app
+## How it works
 
-## Arquivos a criar
-
-```
-docs/docs/integrations/docker.md         — Documentação Docusaurus
-integrations/docker/docker-compose.yml   — Compose exemplo
-integrations/docker/nginx.conf           — Nginx config para o proxy container
-```
-
-## Exemplo docker-compose.yml
-
-```yaml
-services:
-  app:
-    image: your-app:latest
-    ports:
-      - "3000"
-
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - app
-```
-
-## Tarefas
-
-- [ ] Criar `docker-compose.yml` exemplo
-- [ ] Criar `nginx.conf` adaptado para proxy container
-- [ ] Documentação Docusaurus
-- [ ] Testar com Docker Compose real
+The Docker Compose setup runs an Nginx sidecar that intercepts crawler traffic and proxies it to `https://render.getindexboost.com/`. Your main application container continues to serve all other requests normally.

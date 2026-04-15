@@ -1,31 +1,15 @@
-# CloudFront (AWS) Integration
+# Amazon CloudFront — Lambda@Edge
 
-**Categoria:** CDN / Edge (Lambda@Edge)
-**Prioridade:** Fase 3 — CDN / Edge
-**Código Renderfy necessário:** ✅ Sim — Lambda@Edge function fornecida por nós
+No npm package required — deploy the Lambda@Edge function.
 
-## Descrição
+See the full guide in [`cloudfront/README.md`](./cloudfront/README.md).
 
-CloudFront é o CDN da AWS. A integração usa Lambda@Edge (viewer-request) para interceptar crawlers no edge e redirecionar para o Renderfy.
+## Quick start
 
-## Como funciona
+1. Zip and upload [`cloudfront/lambda/index.js`](./cloudfront/lambda/index.js) as a Lambda function in `us-east-1`.
+2. Set the `INDEXBOOST_TOKEN` environment variable (or embed it in the function).
+3. Associate the Lambda function as a **Viewer Request** trigger on your CloudFront distribution.
 
-1. Lambda@Edge associada ao behavior do CloudFront (viewer-request)
-2. Verifica `user-agent` header
-3. Se crawler, modifica origin para `service.renderfy.io`
-4. Se não, deixa seguir para o origin normal
+## How it works
 
-## Arquivos a criar
-
-```
-docs/docs/integrations/cloudfront.md         — Documentação Docusaurus
-integrations/cloudfront/lambda.js            — Lambda@Edge function
-integrations/cloudfront/template.yaml        — SAM/CloudFormation template
-```
-
-## Tarefas
-
-- [ ] Criar Lambda@Edge function (`lambda.js`)
-- [ ] Criar SAM template para deploy
-- [ ] Documentar setup passo-a-passo no Docusaurus
-- [ ] Testar com CloudFront real
+The Lambda@Edge function runs on every viewer request. It detects crawler `User-Agent` strings and, for those requests, fetches the rendered page from `https://render.getindexboost.com/` and returns it directly. All other requests are served normally by CloudFront.

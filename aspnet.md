@@ -1,48 +1,32 @@
-# ASP.NET (C#) Integration
+# ASP.NET Core — `IndexBoost.AspNetCore`
 
-**Categoria:** Backend Framework (NuGet)
-**Prioridade:** Fase 4 — Complementar
-**Código Renderfy necessário:** ✅ Sim — pacote NuGet `Renderfy.AspNet`
+**NuGet package:** [`IndexBoost.AspNetCore`](https://www.nuget.org/packages/IndexBoost.AspNetCore)
 
-## Descrição
+See the full guide in [`aspnet/README.md`](./aspnet/README.md).
 
-ASP.NET é o framework web da Microsoft. A integração é um `DelegatingHandler` ou middleware que detecta crawlers.
-
-## Setup do usuário
+## Quick start
 
 ```bash
-dotnet add package Renderfy.AspNet
+dotnet add package IndexBoost.AspNetCore
 ```
 
 ```csharp
 // Program.cs
-builder.Services.AddRenderfy(options =>
+builder.Services.AddIndexBoost(options =>
 {
-    options.Token = builder.Configuration["IndexBoost:Token"];
+    options.Token = builder.Configuration["INDEXBOOST_TOKEN"]!;
 });
 
-app.UseRenderfy();
+// ...
+
+app.UseIndexBoost();
 ```
 
-## Arquivos a criar
-
-```
-packages/renderfy-aspnet/                     — NuGet package
-  Renderfy.AspNet.csproj
-  RenderfyMiddleware.cs
-  CrawlerDetector.cs
-  RenderfyOptions.cs
-  ServiceCollectionExtensions.cs
-  README.md
-docs/docs/integrations/aspnet.md             — Documentação Docusaurus
+```bash
+# Environment variable or appsettings.json
+INDEXBOOST_TOKEN=your_token_here
 ```
 
-## Tarefas
+## How it works
 
-- [ ] Criar pacote NuGet `Renderfy.AspNet`
-- [ ] Implementar ASP.NET middleware
-- [ ] Implementar `CrawlerDetector`
-- [ ] Extension methods para DI
-- [ ] Testes com xUnit
-- [ ] Publicar no NuGet
-- [ ] Documentação Docusaurus
+An ASP.NET Core middleware component detects crawler `User-Agent` strings and proxies those requests to `https://render.getindexboost.com/` via `HttpClient`. All other requests are passed to the next middleware in the pipeline.

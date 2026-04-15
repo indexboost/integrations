@@ -1,40 +1,30 @@
-# Hapi (Node.js) Integration
+# Hapi — `@indexboost/node`
 
-**Categoria:** Node.js Middleware
-**Prioridade:** Fase 4 — Complementar
-**Código Renderfy necessário:** ✅ Sim — usa pacote `renderfy-node` (mesmo do Express)
+Hapi is supported via the same `@indexboost/node` package as Express and Koa.
 
-## Descrição
+See the full guide in [`express/README.md`](./express/README.md) (Hapi section).
 
-Hapi é um framework Node.js enterprise. Usa o mesmo pacote `renderfy-node` com um plugin Hapi.
-
-## Setup do usuário
+## Quick start
 
 ```bash
-npm install renderfy-node
+npm install @indexboost/node
 ```
 
-```javascript
-const Hapi = require("@hapi/hapi");
-const { hapiPlugin } = require("renderfy-node");
+```typescript
+import Hapi from "@hapi/server";
+import { indexBoostHapiPlugin } from "@indexboost/node/hapi";
 
 const server = Hapi.server({ port: 3000 });
+
 await server.register({
-  plugin: hapiPlugin,
-  options: { token: "YOUR_TOKEN" },
+  plugin: indexBoostHapiPlugin,
+  options: {
+    token: process.env.INDEXBOOST_TOKEN!,
+  },
 });
 ```
 
-## Arquivos a criar
-
+```bash
+# .env
+INDEXBOOST_TOKEN=your_token_here
 ```
-docs/docs/integrations/hapi.md              — Documentação Docusaurus
-```
-
-> O código é parte do pacote `renderfy-node` (ver [express.md](./express.md))
-
-## Tarefas
-
-- [ ] Implementar `hapiPlugin` no pacote `renderfy-node`
-- [ ] Documentação Docusaurus
-- [ ] Testar com Hapi real

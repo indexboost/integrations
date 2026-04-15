@@ -1,47 +1,16 @@
-# Vercel Integration
+# Vercel Edge Functions
 
-**Categoria:** Hosting Platform (Edge Middleware)
-**Prioridade:** Fase 3 — CDN / Edge
-**Código Renderfy necessário:** ✅ Sim — `middleware.ts` na raiz do projeto
+No npm package required — deploy the Edge Function.
 
-## Descrição
+See the full guide in [`vercel/README.md`](./vercel/README.md).
 
-Vercel é a plataforma de hosting do Next.js. A integração usa o Edge Middleware nativo do Vercel para detectar crawlers.
+## Quick start
 
-## Setup do usuário
+1. Copy [`vercel/api/render.js`](./vercel/api/render.js) into your project's `api/` directory.
+2. Copy the rewrite rules from [`vercel/vercel.json`](./vercel/vercel.json) into your `vercel.json`.
+3. Set `INDEXBOOST_TOKEN` in your Vercel project environment variables.
+4. Deploy: `vercel --prod`
 
-```typescript
-// middleware.ts
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+## How it works
 
-const CRAWLERS = /googlebot|bingbot|gptbot|claudebot|perplexitybot/i;
-
-export function middleware(request: NextRequest) {
-  const ua = request.headers.get("user-agent") || "";
-
-  if (CRAWLERS.test(ua)) {
-    const url = request.nextUrl.clone();
-    const renderfyUrl = `https://service.renderfy.io/${url.toString()}`;
-    return fetch(renderfyUrl, {
-      headers: { "X-INDEXBOOST-TOKEN": process.env.INDEXBOOST_TOKEN || "" },
-    });
-  }
-
-  return NextResponse.next();
-}
-```
-
-## Arquivos a criar
-
-```
-docs/docs/integrations/vercel.md             — Documentação Docusaurus
-integrations/vercel/middleware.ts             — Exemplo de middleware
-```
-
-## Tarefas
-
-- [ ] Criar `middleware.ts` exemplo
-- [ ] Documentar variável `INDEXBOOST_TOKEN` no Vercel Dashboard
-- [ ] Documentação Docusaurus
-- [ ] Testar com Vercel real
+A Vercel Edge Function intercepts requests matching the crawler detection pattern and proxies them to `https://render.getindexboost.com/` with your token. Human traffic is served by your normal Vercel deployment.

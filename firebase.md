@@ -1,54 +1,16 @@
-# Firebase Integration
+# Firebase Hosting + Cloud Functions
 
-**Categoria:** Hosting Platform (Cloud Functions)
-**Prioridade:** Fase 4 — Complementar
-**Código Renderfy necessário:** ✅ Sim — Cloud Function + rewrite config
+No npm package required — deploy the Cloud Function.
 
-## Descrição
+See the full guide in [`firebase/README.md`](./firebase/README.md).
 
-Firebase Hosting não suporta middleware nativamente. A integração requer Cloud Functions para interceptar requests, ou usar Cloudflare como proxy na frente do Firebase.
+## Quick start
 
-## Opção 1: Cloud Function
+1. Copy the function from [`firebase/functions/`](./firebase/functions/) into your Firebase Functions project.
+2. Set your token: `firebase functions:config:set indexboost.token="YOUR_TOKEN"`
+3. Add the rewrite rule from [`firebase/firebase.json`](./firebase/firebase.json) to your `firebase.json`.
+4. Deploy: `firebase deploy --only functions,hosting`
 
-```javascript
-// functions/index.js
-const functions = require("firebase-functions");
-const fetch = require("node-fetch");
+## How it works
 
-const CRAWLERS = /googlebot|bingbot|gptbot|claudebot/i;
-
-exports.renderfyRender = functions.https.onRequest(async (req, res) => {
-  const ua = req.headers["user-agent"] || "";
-  if (CRAWLERS.test(ua)) {
-    const url = `https://${req.hostname}${req.originalUrl}`;
-    const response = await fetch(`https://service.renderfy.io/${url}`, {
-      headers: { "X-INDEXBOOST-TOKEN": process.env.INDEXBOOST_TOKEN },
-    });
-    const html = await response.text();
-    res.status(response.status).send(html);
-  } else {
-    // serve static files normally
-    res.redirect(req.originalUrl);
-  }
-});
-```
-
-## Opção 2: Via Cloudflare
-
-Colocar Cloudflare como proxy DNS na frente do Firebase e usar a [integração Cloudflare](./cloudflare.md).
-
-## Arquivos a criar
-
-```
-docs/docs/integrations/firebase.md           — Documentação Docusaurus
-integrations/firebase/functions/index.js     — Cloud Function
-integrations/firebase/firebase.json          — Rewrite config
-```
-
-## Tarefas
-
-- [ ] Criar Cloud Function exemplo
-- [ ] Criar `firebase.json` com rewrite rules
-- [ ] Documentar setup passo-a-passo
-- [ ] Documentar alternativa via Cloudflare
-- [ ] Documentação Docusaurus
+A Firebase Cloud Function intercepts HTTP requests, detects crawler `User-Agent` strings, and proxies those requests to `https://render.getindexboost.com/`. Human traffic is served by Firebase Hosting normally.
