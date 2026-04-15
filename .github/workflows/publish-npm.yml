@@ -65,7 +65,7 @@ jobs:
       # Patch the version in package.json to match the tag
       - name: Set version
         working-directory: ${{ steps.pkg.outputs.dir }}
-        run: npm version "${{ steps.pkg.outputs.version }}" --no-git-tag-version
+        run: npm version "${{ steps.pkg.outputs.version }}" --no-git-tag-version --allow-same-version
 
       - name: Build
         working-directory: ${{ steps.pkg.outputs.dir }}
