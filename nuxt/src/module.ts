@@ -1,4 +1,4 @@
-import { addServerMiddleware, createResolver, defineNuxtModule } from "@nuxt/kit";
+import { addServerHandler, createResolver, defineNuxtModule } from "@nuxt/kit";
 
 export interface ModuleOptions {
   /**
@@ -55,8 +55,8 @@ export default defineNuxtModule<ModuleOptions>({
     };
 
     // Register the Nitro server middleware (runs before routes)
-    addServerMiddleware({
-      name: "indexboost-render",
+    addServerHandler({
+      middleware: true,
       handler: resolve("./runtime/middleware"),
     });
   },
