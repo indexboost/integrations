@@ -23,7 +23,6 @@
   "files": ["dist"],
   "scripts": {
     "build": "nuxt-module-build build",
-    "prepare": "nuxt-module-build build --stub",
     "dev": "nuxi dev playground"
   },
   "peerDependencies": {
