@@ -1,7 +1,16 @@
 name: Publish npm packages
 
 on:
-  workflow_dispatch:    # manual trigger for testing
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "Package to publish (node | next | nuxt)"
+        required: true
+        default: "node"
+      version:
+        description: "Version to publish (e.g. 1.0.0)"
+        required: true
+        default: "1.0.0"
   push:
     tags:
       - "node/v*"       # e.g. node/v1.2.3  → publishes @indexboost/node
@@ -28,9 +37,14 @@ jobs:
       - name: Resolve package directory
         id: pkg
         run: |
-          TAG="${GITHUB_REF_NAME}"   # e.g. "node/v1.2.3"
-          PKG="${TAG%%/v*}"          # "node"
-          VERSION="${TAG#*/v}"       # "1.2.3"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            PKG="${{ github.event.inputs.package }}"
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            TAG="${GITHUB_REF_NAME}"   # e.g. "node/v1.2.3"
+            PKG="${TAG%%/v*}"          # "node"
+            VERSION="${TAG#*/v}"       # "1.2.3"
+          fi
           case "$PKG" in
             node) DIR="express" ;;
             next) DIR="nextjs" ;;
