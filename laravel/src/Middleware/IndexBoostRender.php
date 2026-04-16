@@ -3,8 +3,10 @@
 namespace IndexBoost\Laravel\Middleware;
 
 use Closure;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
 class IndexBoostRender
@@ -48,28 +50,24 @@ class IndexBoostRender
             return false;
         }
 
-        // Only GET requests
         if (!$request->isMethod('GET')) {
             return false;
         }
 
-        // Skip static assets
         if (preg_match(self::STATIC_EXTENSIONS, $request->path())) {
             return false;
         }
 
-        // Check ignored URI patterns
         foreach ((array) config('indexboost.ignored_uris', []) as $pattern) {
             if (preg_match($pattern, $request->getRequestUri())) {
                 return false;
             }
         }
 
-        // Check user agent
-        $ua = $request->userAgent() ?? '';
-        $pattern = config('indexboost.crawler_pattern');
+        $ua      = $request->userAgent() ?? '';
+        $pattern = (string) config('indexboost.crawler_pattern', '');
 
-        return preg_match("/{$pattern}/i", $ua) === 1;
+        return $pattern !== '' && preg_match("/{$pattern}/i", $ua) === 1;
     }
 
     private function fetchRendered(Request $request): ?string
@@ -79,36 +77,25 @@ class IndexBoostRender
         $timeout    = (int) config('indexboost.timeout', 30);
         $fullUrl    = $request->fullUrl();
 
-        $renderUrl = $serviceUrl . '/?url=' . urlencode($fullUrl);
+        try {
+            $response = Http::timeout($timeout)
+                ->withHeaders([
+                    'X-INDEXBOOST-TOKEN'     => $token,
+                    'X-Original-User-Agent'  => $request->userAgent() ?? '',
+                ])
+                ->get($serviceUrl . '/', ['url' => $fullUrl]);
 
-        $context = stream_context_create([
-            'http' => [
-                'method'  => 'GET',
-                'header'  => implode("\r\n", [
-                    "X-INDEXBOOST-TOKEN: {$token}",
-                    "X-Original-User-Agent: " . ($request->userAgent() ?? ''),
-                ]),
-                'timeout' => $timeout,
-                'ignore_errors' => true,
-            ],
-            'ssl' => [
-                'verify_peer'      => true,
-                'verify_peer_name' => true,
-            ],
-        ]);
+            if (!$response->successful()) {
+                return null;
+            }
 
-        $html = @file_get_contents($renderUrl, false, $context);
+            $body = $response->body();
 
-        if ($html === false || empty($html)) {
+            return $body !== '' ? $body : null;
+        } catch (ConnectionException) {
+            return null;
+        } catch (\Throwable) {
             return null;
         }
-
-        // Check response code from $http_response_header
-        $statusLine = $http_response_header[0] ?? '';
-        if (!str_contains($statusLine, '200')) {
-            return null;
-        }
-
-        return $html;
     }
 }

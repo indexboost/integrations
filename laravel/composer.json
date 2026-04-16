@@ -24,14 +24,14 @@
             "IndexBoost\\Laravel\\Tests\\": "tests/"
         }
     },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
     "extra": {
         "laravel": {
             "providers": [
                 "IndexBoost\\Laravel\\IndexBoostServiceProvider"
-            ],
-            "aliases": {
-                "IndexBoost": "IndexBoost\\Laravel\\Facades\\IndexBoost"
-            }
+            ]
         }
     },
     "minimum-stability": "stable",
