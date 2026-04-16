@@ -79,7 +79,7 @@ public sealed partial class IndexBoostMiddleware
             if (path.StartsWith(ignored, StringComparison.OrdinalIgnoreCase)) return false;
         }
 
-        var ua = ctx.Request.Headers["User-Agent"].ToString();
+        var ua = ctx.Request.Headers.UserAgent.ToString();
         return _crawlerRegex.IsMatch(ua);
     }
 
@@ -95,7 +95,7 @@ public sealed partial class IndexBoostMiddleware
 
         using var message = new HttpRequestMessage(HttpMethod.Get, renderUrl);
         message.Headers.Add("X-INDEXBOOST-TOKEN", _options.Token);
-        message.Headers.Add("X-Original-User-Agent", req.Headers["User-Agent"].ToString());
+        message.Headers.Add("X-Original-User-Agent", req.Headers.UserAgent.ToString());
 
         try
         {
