@@ -1,6 +1,12 @@
 name: Publish .NET package (NuGet)
 
 on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish (e.g. 1.0.0)"
+        required: true
+        default: "1.0.0"
   push:
     tags:
       - "aspnet/v*"   # e.g. aspnet/v1.2.3
@@ -20,8 +26,12 @@ jobs:
       - name: Resolve version from tag
         id: ver
         run: |
-          TAG="${GITHUB_REF_NAME}"
-          echo "version=${TAG#*/v}" >> "$GITHUB_OUTPUT"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            TAG="${GITHUB_REF_NAME}"
+            echo "version=${TAG#*/v}" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Restore
         working-directory: aspnet
